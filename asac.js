@@ -1,8 +1,11 @@
-var casper = require("casper").create();
+var casper = require('casper').create({
+    verbose: true,
+    logLevel: 'debug'
+});
 
 // url is mandatory
 if (casper.cli.args.length === 0 && Object.keys(casper.cli.options).length === 0) {
-    casper.echo("No arg nor option passed").exit();
+    casper.log('url param required', 'error').exit();
 }
 
 var url = casper.cli.get(0);
@@ -31,27 +34,36 @@ function getHTML(fileName) {
 }
 
 // open product page
+// casper.start(url);
 casper.start(url);
-console.log('shopping! 💁 👗 💍 👠 👛')
-console.log('visiting ', url);
+casper.log('shopping! 💁 👗 💍 👠 👛', 'info');
+casper.log('visiting ' + url, 'debug');
 
 casper.then(function() {
-    this.capture('01.png');
-    console.log('adding product to cart 🎁');
-    this.click('#add-to-cart-button');
-    getHTML('01.html');
+    this.log('checking bot check 🤖', 'debug');
+    if (this.getTitle() === 'Bot Check') {
+        this.log('busted 👮 🚓', 'error');
+        this.exit();
+    }
 });
 
 casper.then(function() {
-console.log('visiting cart 🛍');
+    this.capture('01.png');
+    getHTML('01.html');
+    this.log('adding product to cart 🎁', 'debug');
+    this.click('#add-to-cart-button');
+});
+
+casper.then(function() {
+    this.log('visiting cart 🛍', 'debug');
     this.click('#hlb-view-cart');
     this.capture('02.png');
     getHTML('02.html');
 });
 
 casper.then(function() {
-    console.log('setting amount of items to 999 😎 💳');
-    console.log('click dropdown');
+    this.log('setting amount of items to 999 😎 💳', 'debug');
+    this.log('click dropdown');
     this.click('#a-autoid-0-announce');
     this.capture('03.png');
     getHTML('03.html');
@@ -59,38 +71,55 @@ casper.then(function() {
 
 casper.waitForSelector('#dropdown1_9', function() {
 // casper.then(function() {
-    console.log('click 10+');
+    this.log('click 10+', 'debug');
     this.click('#dropdown1_9');
     this.capture('04.png');
     getHTML('04.html');
 });
 
 casper.then(function() {
-    console.log('sending keys');
-    this.sendKeys('#activeCartViewForm > div.sc-list-body > div > div.sc-list-item-content > div.a-row.a-spacing-base.a-spacing-top-base > div.a-column.a-span2.a-text-right.sc-action-links.a-span-last > div > div > input', '999');
+    this.log('sending keys', 'debug');
+    // this.sendKeys('#activeCartViewForm > div.sc-list-body > div > div.sc-list-item-content > div.a-row.a-spacing-base.a-spacing-top-base > div.a-column.a-span2.a-text-right.sc-action-links.a-span-last > div > div > input', '999');
+    this.sendKeys('#activeCartViewForm > div.sc-list-body > div > div.sc-list-item-content > div.a-row.a-spacing-base.a-spacing-top-base > div.a-column.a-span2.a-text-right.sc-action-links.a-span-last > div > div > input', '999', {keepFocus: true});
+    this.sendKeys('#activeCartViewForm > div.sc-list-body > div > div.sc-list-item-content > div.a-row.a-spacing-base.a-spacing-top-base > div.a-column.a-span2.a-text-right.sc-action-links.a-span-last > div > div > input', this.page.event.key.Enter, {keepFocus: true});
     this.capture('05.png');
     getHTML('05.html');
 });
 
 casper.waitForSelector('#a-autoid-1-announce', function() {
-    console.log('accepting');
+    this.log('accepting', 'debug');
     this.click('#a-autoid-1-announce');
     this.capture('06.png');
     getHTML('06.html');
+
+    // casper.waitForSelector('#activeCartViewForm > div.sc-list-body > div > div.sc-list-item-content > div.sc-quantity-update-message.a-spacing-top-mini > div > div', function() {
+    // // casper.waitForSelector('#activeCartViewForm > div.sc-list-body > div:nth-child(2) > div.sc-list-item-content > div.sc-quantity-update-message.a-spacing-top-mini > div > div', function() {
+    //     this.log('error box is here', 'debug');
+    //     this.capture('07.png');
+    //     getHTML('07.html');
+    //     var inStock = this.evaluate(function() {
+    //         return document.querySelector('#activeCartViewForm > div.sc-list-body > div > div.sc-list-item-content > div.sc-quantity-update-message.a-spacing-top-mini > div > div > div > span').innerText.match(/\d+/)[0];
+    //     });
+    //     var tabChar = '\t',
+    //         newlineChar = '\n';
+    //     casper.log(timestamp + tabChar + url + tabChar + inStock + newlineChar, 'info');
+    // });
 });
 
-console.log('waiting for error box 🕑 👀');
-casper.waitForSelector('#activeCartViewForm > div.sc-list-body > div:nth-child(2) > div.sc-list-item-content > div.sc-quantity-update-message.a-spacing-top-mini > div > div', function() {
-console.log('error box is here');
-    // the stock amount is now the value of the input element
-    var inStock = document.querySelector('#activeCartViewForm > div.sc-list-body > div:nth-child(2) > div.sc-list-item-content > div.a-row.a-spacing-base.a-spacing-top-base > div.a-column.a-span2.a-text-right.sc-action-links.a-span-last > div > div > input').value;
-    var tab = '\t',
-        newline = '\n';
-    console.log(timestamp + tab + url + tab + inStock + newline);
+casper.waitForSelector('#activeCartViewForm > div.sc-list-body > div > div.sc-list-item-content > div.sc-quantity-update-message.a-spacing-top-mini > div > div', function() {
+    this.log('error box is here', 'debug');
+    this.capture('07.png');
+    getHTML('07.html');
+    var inStock = this.evaluate(function() {
+        return document.querySelector('#activeCartViewForm > div.sc-list-body > div > div.sc-list-item-content > div.sc-quantity-update-message.a-spacing-top-mini > div > div > div > span').innerText.match(/\d+/)[0];
+    });
+    var tabChar = '\t',
+        newlineChar = '\n';
+    casper.log(timestamp + tabChar + url + tabChar + inStock + newlineChar, 'info');
 });
 
 casper.then(function() {
-    console.log('selfie! 📷');
+    this.log('selfie! 📷');
     this.capture('selfie.png');
 });
 
