@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+#
+# feed urls to asac
+# $1: the file
+# $2: sleep timeout (to avoid capture) (optional)
+
+FILE="$1"
+TIMEOUT=${2:-60}
+
+while read line; do
+      casperjs --cookies-file=cookies.txt asac.js $line
+      sleep "$TIMEOUT"
+done <"$FILE"
