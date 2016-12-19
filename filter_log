@@ -3,4 +3,5 @@
 # filter results from debug messages in a product-log
 # $1: the log file
 
+echo -e 'datetime\tasin\tstock amount\turl'
 grep '[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}' "$1"
