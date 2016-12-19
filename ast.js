@@ -2,6 +2,8 @@ var casper = require('casper').create({
     verbose: true,
     logLevel: 'debug'
 });
+casper.options.waitTimeout = 10000;
+
 // var casper.options.verbose = casper.cli.has('verbose');
 var url = casper.cli.get(0);
 
@@ -136,6 +138,11 @@ casper.waitForSelector(selectors.cartPage.spanAvailabilityInfo, function() {
     this.log('error box is here', 'debug');
 
     // extract stock amount from error message
+    captureHTML('errormsg.html');
+    var msg = this.evaluate(function() {
+        return document.querySelector(selectors.cartPage.spanAvailabilityInfo);
+    });
+    this.log(msg, 'debug');
     stockAmount = this.evaluate(function() {
         return document.querySelector(selectors.cartPage.spanAvailabilityInfo).innerText.match(/\d+/)[0];
     });
