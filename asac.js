@@ -107,7 +107,6 @@ checkBotCheck();
 casper.waitForSelector(selectors.productPage.buttonAddToCart, function() {
     this.log('adding product to cart 🎁', 'debug');
     this.click(selectors.productPage.buttonAddToCart);
-    captureHTML('cart.html');
 });
 
 casper.waitForSelector(selectors.productPage.buttonViewCart, function() {
