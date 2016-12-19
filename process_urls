@@ -8,19 +8,18 @@ FILE="$1"
 TIMEOUT=${2:-300}
 
 while read line; do
+    rm data/cookies.txt 2> /dev/null
     # feed a line
-    casperjs --cookies-file=cookies.txt asac.js $line
+    casperjs --cookies-file=data/cookies.txt asac.js $line
 
     # display a timer
-    local secs="$TIMEOUT"
+    secs=$TIMEOUT
     echo "sleeping for:"
-    while [ $secs -gt 0 ]; do
+    while [[ $secs -gt 0 ]]; do
         # TODO: format minutes
         echo -ne "$secs\033[0K\r"
         sleep 1
         : $((secs--))
     done
-
-    rm cookies.txt
 
 done <"$FILE"
