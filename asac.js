@@ -2,15 +2,18 @@ var casper = require('casper').create({
     verbose: true,
     logLevel: 'debug'
 });
+// var casper.options.verbose = casper.cli.has('verbose');
+var url = casper.cli.get(0);
 
 // url is mandatory
 if (casper.cli.args.length === 0 && Object.keys(casper.cli.options).length === 0) {
+    // TODO check all params
     casper.log('url param required', 'error').exit();
 }
-var url = casper.cli.get(0);
 
 // required in ordner to retrieve amazon cookies
 // macOS Chrome
+// TODO provide different useragents
 casper.userAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36');
 
 var colorizer = require('colorizer').create('Colorizer');
@@ -69,6 +72,12 @@ function checkBotCheck () {
     });
 }
 
+function extractASIN(url) {
+    var asinRegex = /\/([A-Z0-9]{10})/,
+        match = asinRegex.exec(url);
+    return match[1];
+}
+
 // objective
 var stockAmount = 0;
 
@@ -95,42 +104,45 @@ casper.log('visiting ' + url, 'debug');
 
 checkBotCheck();
 
-casper.waitForSelector('#add-to-cart-button', function() {
+casper.waitForSelector(selectors.productPage.buttonAddToCart, function() {
     this.log('adding product to cart 🎁', 'debug');
-    this.click('#add-to-cart-button');
+    this.click(selectors.productPage.buttonAddToCart);
+    captureHTML('cart.html');
 });
 
-casper.waitForSelector('#hlb-view-cart-announce', function() {
+casper.waitForSelector(selectors.productPage.buttonViewCart, function() {
     this.log('visiting cart 🛍', 'debug');
-    this.click('#hlb-view-cart-announce');
+    this.click(selectors.productPage.buttonViewCart);
 });
 
-casper.waitForSelector('#a-autoid-0-announce', function() {
+casper.waitForSelector(selectors.cartPage.buttonAmount, function() {
     this.log('setting amount of items to 999 😎 💳', 'debug');
     this.log('click dropdown');
-    this.click('#a-autoid-0-announce');
+    this.click(selectors.cartPage.buttonAmount);
 });
 
-casper.waitForSelector('#dropdown1_9', function() {
+casper.waitForSelector(selectors.cartPage.dropdownTenPlus, function() {
     this.log('click 10+', 'debug');
-    this.click('#dropdown1_9');
+    this.click(selectors.cartPage.dropdownTenPlus);
 });
 
-casper.waitForSelector('#activeCartViewForm > div.sc-list-body > div > div.sc-list-item-content > div.a-row.a-spacing-base.a-spacing-top-base > div.a-column.a-span2.a-text-right.sc-action-links.a-span-last > div > div > input', function() {
+casper.waitForSelector(selectors.cartPage.inputCustomAmount, function() {
     this.log('sending keys', 'debug');
-    this.sendKeys('#activeCartViewForm > div.sc-list-body > div > div.sc-list-item-content > div.a-row.a-spacing-base.a-spacing-top-base > div.a-column.a-span2.a-text-right.sc-action-links.a-span-last > div > div > input', '999', {keepFocus: true});
-    this.sendKeys('#activeCartViewForm > div.sc-list-body > div > div.sc-list-item-content > div.a-row.a-spacing-base.a-spacing-top-base > div.a-column.a-span2.a-text-right.sc-action-links.a-span-last > div > div > input', this.page.event.key.Enter, {keepFocus: true});
+    this.sendKeys(selectors.cartPage.inputCustomAmount, '999', {keepFocus: true});
+    this.sendKeys(selectors.cartPage.inputCustomAmount, this.page.event.key.Enter, {keepFocus: true});
 });
 
 // waiting for the error box saying sry no more than x items in stock
-casper.waitForSelector('#activeCartViewForm > div.sc-list-body > div > div.sc-list-item-content > div.sc-quantity-update-message.a-spacing-top-mini > div > div > div > span', function() {
+casper.waitForSelector(selectors.cartPage.spanAvailabilityInfo, function() {
     this.log('error box is here', 'debug');
 
     // extract stock amount from error message
     stockAmount = this.evaluate(function() {
-        return document.querySelector('#activeCartViewForm > div.sc-list-body > div > div.sc-list-item-content > div.sc-quantity-update-message.a-spacing-top-mini > div > div > div > span').innerText.match(/\d+/)[0];
+        return document.querySelector(selectors.cartPage.spanAvailabilityInfo).innerText.match(/\d+/)[0];
     });
-    log(url, stockAmount);
+
+    var asin = extractASIN(url);
+    log(asin, stockAmount, url);
 });
 
 // 999 is available
@@ -138,7 +150,8 @@ casper.then(function() {
     if (stockAmount === 0) {
         this.log('stock amount > 999', 'error');
         stockAmount = '999';
-        log(url, stockAmount);
+        var asin = extractASIN(url);
+        log(asin, stockAmount, url);
     }
 });
 
