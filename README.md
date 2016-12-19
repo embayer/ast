@@ -1,4 +1,4 @@
-# amazon stock amount checker
+# amazon stock tracker
 
 [casperJS](http://casperjs.org/) script to check amazon product stock amounts.
 
@@ -13,11 +13,11 @@ Install casperJS
 
 ## run
 
-Utilize asac.js directly to check a single url.
+Utilize ast.js directly to check a single url.
 
 ```sh
     # single amazon product url
-    casperjs --cookies-file=cookies.txt asac.js https://www.amazon.de/Some-Amazon-Product/dp/B00P448CWU/ >> data/products.log
+    casperjs --cookies-file=cookies.txt ast.js https://www.amazon.de/Some-Amazon-Product/dp/B00P448CWU/ >> data/products.log
 ```
 
 ### or

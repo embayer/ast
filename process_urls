@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# feed urls to asac.js
+# feed urls to ast.js
 # $1: the url file
 # $2: sleep timeout (to avoid capture) (optional)
 
@@ -10,7 +10,7 @@ TIMEOUT=${2:-300}
 while read line; do
     rm data/cookies.txt 2> /dev/null
     # feed a line
-    casperjs --cookies-file=data/cookies.txt asac.js $line
+    casperjs --cookies-file=data/cookies.txt ast.js $line
 
     # display a timer
     secs=$TIMEOUT
