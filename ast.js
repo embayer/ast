@@ -69,7 +69,7 @@ function checkBotCheck () {
         this.log('checking bot check 🤖', 'debug');
         if (this.getTitle() === 'Bot Check') {
             this.log('busted 👮 🚓', 'error');
-            this.exit();
+            this.exit(1);
         }
     });
 }
