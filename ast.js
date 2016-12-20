@@ -106,48 +106,78 @@ casper.log('visiting ' + url, 'debug');
 
 checkBotCheck();
 
-casper.waitForSelector(selectors.productPage.buttonAddToCart, function() {
-    this.log('adding product to cart 🎁', 'debug');
-    this.click(selectors.productPage.buttonAddToCart);
-});
+casper.waitForSelector(selectors.productPage.buttonAddToCart,
+    function success() {
+        this.log('adding product to cart 🎁', 'debug');
+        this.click(selectors.productPage.buttonAddToCart);
+    },
+    function fail() {
+        this.exit(2);
+    }
+);
 
-casper.waitForSelector(selectors.productPage.buttonViewCart, function() {
-    this.log('visiting cart 🛍', 'debug');
-    this.click(selectors.productPage.buttonViewCart);
-});
+casper.waitForSelector(selectors.productPage.buttonViewCart,
+    function success() {
+        this.log('visiting cart 🛍', 'debug');
+        this.click(selectors.productPage.buttonViewCart);
+    },
+    function fail() {
+        this.exit(2);
+    }
+);
 
-casper.waitForSelector(selectors.cartPage.buttonAmount, function() {
-    this.log('setting amount of items to 999 😎 💳', 'debug');
-    this.log('click dropdown');
-    this.click(selectors.cartPage.buttonAmount);
-});
+casper.waitForSelector(selectors.cartPage.buttonAmount,
+    function success() {
+        this.log('setting amount of items to 999 😎 💳', 'debug');
+        this.log('click dropdown');
+        this.click(selectors.cartPage.buttonAmount);
+    },
+    function fail() {
+        this.exit(2);
+    }
+);
 
-casper.waitForSelector(selectors.cartPage.dropdownTenPlus, function() {
-    this.log('click 10+', 'debug');
-    this.click(selectors.cartPage.dropdownTenPlus);
-});
+casper.waitForSelector(selectors.cartPage.dropdownTenPlus,
+    function success() {
+        this.log('click 10+', 'debug');
+        this.click(selectors.cartPage.dropdownTenPlus);
+    },
+    function fail() {
+        this.exit(2);
+    }
+);
 
-casper.waitForSelector(selectors.cartPage.inputCustomAmount, function() {
-    this.log('sending keys', 'debug');
-    this.sendKeys(selectors.cartPage.inputCustomAmount, '999', {keepFocus: true});
-    this.sendKeys(selectors.cartPage.inputCustomAmount, this.page.event.key.Enter, {keepFocus: true});
-});
+casper.waitForSelector(selectors.cartPage.inputCustomAmount,
+    function success() {
+        this.log('sending keys', 'debug');
+        this.sendKeys(selectors.cartPage.inputCustomAmount, '999', {keepFocus: true});
+        this.sendKeys(selectors.cartPage.inputCustomAmount, this.page.event.key.Enter, {keepFocus: true});
+    },
+    function fail() {
+        this.exit(2);
+    }
+);
 
-// waiting for the error box saying sry no more than x items in stock
-casper.waitForSelector(selectors.cartPage.spanAvailabilityInfo, function() {
-    this.log('error box is here', 'debug');
+casper.waitForSelector(selectors.cartPage.spanAvailabilityInfo,
+    function success() {
+        this.log('error box is here', 'debug');
 
-    // extract stock amount from error message
+        // extract stock amount from error message
 
-    // // TODO this should also work
-    // stockAmount = this.evaluate(function() {
-    //     return document.querySelector(selectors.cartPage.spanAvailabilityInfo).innerText;
-    // });
-    stockAmount = this.getElementInfo(selectors.cartPage.spanAvailabilityInfo).text.match(/\d+/)[0];
+        // // TODO this should also work
+        // stockAmount = this.evaluate(function() {
+        //     return document.querySelector(selectors.cartPage.spanAvailabilityInfo).innerText;
+        // });
+        stockAmount = this.getElementInfo(selectors.cartPage.spanAvailabilityInfo).text.match(/\d+/)[0];
 
-    var asin = extractASIN(url);
-    log(asin, stockAmount, url);
-});
+        var asin = extractASIN(url);
+        log(asin, stockAmount, url);
+
+    },
+    function fail() {
+        this.exit(2);
+    }
+);
 
 // 999 is available
 casper.then(function() {
