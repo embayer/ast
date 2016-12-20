@@ -138,14 +138,12 @@ casper.waitForSelector(selectors.cartPage.spanAvailabilityInfo, function() {
     this.log('error box is here', 'debug');
 
     // extract stock amount from error message
-    captureHTML('errormsg.html');
-    var msg = this.evaluate(function() {
-        return document.querySelector(selectors.cartPage.spanAvailabilityInfo);
-    });
-    this.log(msg, 'debug');
-    stockAmount = this.evaluate(function() {
-        return document.querySelector(selectors.cartPage.spanAvailabilityInfo).innerText.match(/\d+/)[0];
-    });
+
+    // // TODO this should also work
+    // stockAmount = this.evaluate(function() {
+    //     return document.querySelector(selectors.cartPage.spanAvailabilityInfo).innerText;
+    // });
+    stockAmount = this.getElementInfo(selectors.cartPage.spanAvailabilityInfo).text.match(/\d+/)[0];
 
     var asin = extractASIN(url);
     log(asin, stockAmount, url);
