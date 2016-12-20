@@ -14,6 +14,17 @@ while read line; do
     rm data/cookies.txt 2> /dev/null
     # feed a line
     casperjs --cookies-file=data/cookies.txt ast.js $line
+    if [ $? -ne 0 ]; then
+        echo "capture error sleeping for:"
+        secs=600
+        echo "sleeping for:"
+        while [[ $secs -gt 0 ]]; do
+            # TODO: format minutes
+            echo -ne "$secs\033[0K\r"
+            sleep 1
+            : $((secs--))
+        done
+    fi
 
     count=$((count+1))
     echo "finished $count"
