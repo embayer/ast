@@ -14,9 +14,9 @@ while read line; do
     rm data/cookies.txt 2> /dev/null
     # feed a line
     casperjs --cookies-file=data/cookies.txt ast.js $line
-    if [ $? -ne 0 ]; then
-        echo "capture error sleeping for:"
-        secs=600
+    if [[ $? -eq 1 ]]; then
+        echo "capture error"
+        secs=$TIMEOUT
         echo "sleeping for:"
         while [[ $secs -gt 0 ]]; do
             # TODO: format minutes
@@ -24,6 +24,10 @@ while read line; do
             sleep 1
             : $((secs--))
         done
+    elif [[ $? -eq 2 ]]; then
+        # retry
+        echo "dom element did not show up error"
+        # TODO retry || write to retry_$FILE
     fi
 
     count=$((count+1))
