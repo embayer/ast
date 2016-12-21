@@ -4,14 +4,20 @@
 
 ## installation
 
-Install casperJS
+- Install casperJS
 
 ```sh
     # macOS
     brew install casperjs
 ```
 
-Install [python 3.4.1](https://www.python.org/downloads/release/python-341/)
+- Install [python 3.4.1](https://www.python.org/downloads/release/python-341/)
+
+- Install [http://click.pocoo.org/5/](click)
+
+```sh
+    pip install -r requirements.txt
+```
 
 ## run
 
