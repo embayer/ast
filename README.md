@@ -11,6 +11,8 @@ Install casperJS
     brew install casperjs
 ```
 
+Install [python 3.4.1](https://www.python.org/downloads/release/python-341/)
+
 ## run
 
 Utilize ast.js directly to check a single url.
@@ -28,6 +30,7 @@ Utilize the wrapper script scrape to check a list of urls provided by a text fil
     # from a amazon product url text file
     # $1: the file
     # $2: sleep timeout (to avoid capture) (optional)
+    # remember to use the correct python version here
     ./scrape data/urls.txt 500
 ```
 
