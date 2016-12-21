@@ -2,6 +2,7 @@
 
 from subprocess import call
 from sys import exit
+from os import remove
 from time import sleep
 
 import click
@@ -60,8 +61,15 @@ class Scraper(object):
             self.countdown(self.timeout)
 
     def scrape_url(self, url, log_file):
+        self.remove_cookies()
         # return the returncode
         return call(['casperjs', 'ast.js', url, log_file])
+
+    def remove_cookies(self, cookies='data/cookies.txt'):
+        try:
+            remove(cookies)
+        except OSError:
+            pass
 
     def print_separator(self):
         print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
