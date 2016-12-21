@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+
+from subprocess import call
+from sys import exit
+from time import sleep
+
+import click
+
+
+@click.command()
+@click.option('--url_file', help='the list of urls to scrape')
+@click.option('--timeout', default=300, 
+              help='seconds to sleep in order to avoid captchas')
+def init(url_file, timeout):
+    """read the urls from a url file and feed it to ast.js"""
+    scraper = Scraper(url_file, timeout)
+    scraper.scrape()
+
+
+class Scraper(object):
+    captcha_timeout = 30 * 60
+
+    def __init__(self, url_file, timeout):
+        self.url_file = url_file
+        self.timeout = timeout
+
+        self.log_file = url_file + '.log'
+
+        with open(url_file) as f:
+            self.urls = f.readlines()
+        # diff against to see if everything is processed
+        self.processed_urls = []
+
+    def scrape(self):
+        # scrape until every url is successfully processed
+        while set(self.urls) != set(self.processed_urls):
+            queue = list(set(self.urls) - set(self.processed_urls))
+            self.scrape_list(queue)
+
+        print('done')
+        exit(0)
+
+    def scrape_list(self, urls):
+        for idx, url in enumerate(urls):
+            self.print_separator()
+            print('{}: {}'.format(idx, url))
+            return_code = self.scrape_url(url, self.log_file)
+
+            if return_code == 0:
+                print('success')
+                self.processed_urls.append(url)
+            elif return_code == 1:
+                print('captcha error')
+                self.countdown(self.captcha_timeout)
+                continue
+            elif return_code == 2:
+                print('dom-element error')
+
+            # TODO don't wait after last url
+            self.countdown(self.timeout)
+
+    def scrape_url(self, url, log_file):
+        # return the returncode
+        return call(['casperjs', 'ast.js', url, log_file])
+
+    def print_separator(self):
+        print('- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -')
+
+    def countdown(self, timeout):
+        while timeout:
+            mins, secs = divmod(timeout, 60)
+            timeformat = '{:02d}:{:02d}'.format(mins, secs)
+            print(timeformat, end='\r')
+            sleep(1)
+            timeout -= 1
+
+if __name__ == '__main__':
+    init()
