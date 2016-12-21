@@ -4,13 +4,18 @@ var casper = require('casper').create({
 });
 casper.options.waitTimeout = 10000;
 
+var fs = require('fs');
+
+// var colorizer = require('colorizer').create('Colorizer');
+
 // var casper.options.verbose = casper.cli.has('verbose');
-var url = casper.cli.get(0);
+var url = casper.cli.get(0),
+    logFile = casper.cli.get(1);
 
 // url is mandatory
 if (casper.cli.args.length === 0 && Object.keys(casper.cli.options).length === 0) {
     // TODO check all params
-    casper.log('url param required', 'error').exit();
+    casper.log('url param required', 'error').exit(3);
 }
 
 // required in ordner to retrieve amazon cookies
@@ -18,7 +23,6 @@ if (casper.cli.args.length === 0 && Object.keys(casper.cli.options).length === 0
 // TODO provide different useragents
 casper.userAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36');
 
-var colorizer = require('colorizer').create('Colorizer');
 
 function isSessionVerbose () {
     return casper.options.verbose;
@@ -62,6 +66,8 @@ function log () {
     var logLine = getTimestamp() + msg + newlineChar;
     // console.log(colorizer.colorize(logLine));
     console.log(logLine);
+    // write logfile
+    fs.write(logFile, logLine, 'a');
 }
 
 function checkBotCheck () {
@@ -112,6 +118,7 @@ casper.waitForSelector(selectors.productPage.buttonAddToCart,
         this.click(selectors.productPage.buttonAddToCart);
     },
     function fail() {
+        // TODO write html on error?
         this.exit(2);
     }
 );
