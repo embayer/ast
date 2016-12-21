@@ -31,7 +31,7 @@ Utilize the wrapper script scrape to check a list of urls provided by a text fil
     # $1: the file
     # $2: sleep timeout (to avoid capture) (optional)
     # remember to use the correct python version here
-    ./scrape data/urls.txt 500
+    ./scrape --url_file=data/urls.txt --timeout=500
 ```
 
 ## view the log

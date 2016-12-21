@@ -46,8 +46,7 @@ function getTimestamp () {
 
 function captureHTML (fileName) {
     casper.then(function() {
-        var fs = require('fs'),
-            html = this.getHTML(),
+        var html = this.getHTML(),
             f = fs.open(fileName, 'w');
         f.write(html);
         f.close();
